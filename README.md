@@ -1,6 +1,6 @@
-This project was created to document the creation of a PHP client and server communicating via the Thrift framework. To better learn and illustrate the use of Thrift, I wanted to build a simple, but non-trivial, project that offered functionality that might actually be useful.
+This project was created to document the creation of a PHP client and server communicating via the Thrift framework. To better learn and illustrate the use of Thrift, I wanted to build a simple, but non-trivial, mini-application that performed tasks that might actually be useful.
 
-This project defines a client that passes raw text to a server. The server uses the [Zemanta contextual intelligence engine](http://zemanta.com) to analyze the text for key topics and categorizations of the content. The article and its topics of interest are categorized using the [DMOZ](http://dmoz.org) and [Freebase](http://freebase.com) taxonomies. The communication that happens between client and server, of course, happens via a Thrift interface.
+This project defines a client that passes raw text to a server. The server uses the [Zemanta contextual intelligence engine](http://zemanta.com) to analyze the text for key topics and categorizations of the content. The article and its topics of interest are categorized using the [DMOZ](http://dmoz.org) and [Freebase](http://freebase.com) taxonomies. The communication between client and server, of course, happens via a Thrift interface.
 
 # Thrift
 
@@ -18,9 +18,7 @@ This has been documented elsewhere so I won't belabor things here. For OS X, I u
 
 # Project Contents
 
-## Contents
-
-This repository contains everything required to standup and test the project's functionality.
+This repository contains all of the resources required to standup and test the project's functionality. In true IKEA fashion, though, some configuration is required. More on that in a bit.
 
 * `gen-php/`
 
@@ -28,16 +26,40 @@ This repository contains everything required to standup and test the project's f
 
 * `lib/`
 
-    The Thrift internals required to support the client and server bindings. These are created during the Thrift installation and have been copied into the project for convenience. In an enterprise solution, these would likely be linked directly from the Thrift installation directory (`<thrift install path>/lib`).
+    The Thrift internals required to support the client and server bindings. These are created during the Thrift installation and have been copied into the project for convenience. In an enterprise solution, these would likely be linked directly from the Thrift installation directory (`<thrift_install_path>/lib`).
 
 * `server/`
 
     The Thrift server created atop the internals and exposed via HTTP for client access.
 
-* `test/`
+* `client/`
 
     A PHP Thrift client specifically built to test the server implementation. This directory also includes a number of sample text files that will be analyzed randomly when the client app is loaded into a browser.
 
 * `zemantdecorator.thrift`
 
     The Thrift interface definition file.
+
+# Project Installation and Configuration
+
+As mentioned above, all of the bits are in place already, but some environmental configuration is required. 
+
+## Services
+
+Before any of this can be wired up and operational, you'll need a [Zemanta API key](http://developer.zemanta.com/member/register). The key gives you access to [1000 API calls per day](http://developer.zemanta.com/docs) by default. No key is required to use the Freebase API. This project only reads from Freebase; reads are [throttled at 100,000 per day](http://wiki.freebase.com/wiki/API#Limits_.28Quota.29).
+
+## Web Server
+
+Providing detailed instructions for installing a web server are beyond the scope of this project. If you're here and still reading, I'm just going to assume that doing this doesn't scare the bejesus out of you and stick to the highlights of my own configuration. If your bejesus is firmly intact, you'll understand how to tailor these steps to match your own environment.
+
+I run a local Apache server on OS X with named virtual hosts turned on. I have one host pointing to the `client/` directory and another pointing to the `server/` directory. For convenience, I added `DirectoryIndex` directives for `client.php` and `server.php`, respectively.
+
+    TODO: INSERT SAMPLE virtual-host.conf CONTENT
+
+## Server & Client
+
+Configuring the server and client is as simple as copying the `config.sample.php` file in each to `config.php` and updating the values appropriately.
+
+The server requires one additional change. You'll have to add your key to the `zemanta_service.php` class file:
+
+    const API_KEY = 'YOUR_ZEMANTA_API_KEY_HERE';
