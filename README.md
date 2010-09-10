@@ -54,7 +54,46 @@ Providing detailed instructions for installing and/or configuring a web server a
 
 I run a local Apache server on OS X with named virtual hosts turned on. I have one host pointing to the `client/` directory and another pointing to the `server/` directory. For convenience, I added `DirectoryIndex` directives for `client.php` and `server.php`, respectively.
 
-    TODO: INSERT SAMPLE virtual-host.conf CONTENT
+    # 
+    # SERVER
+    # 
+    <VirtualHost *:80>
+      ServerName     thrift.php.server.local
+      ServerAlias    thrift.php.server thrift.php.server.dev thrift.php.server.dev.local
+      DocumentRoot   /var/www/thrift-example/server
+      DirectoryIndex server.php
+      
+      ErrorLog     /var/www/.logs/thrift.php.server/error_log
+      CustomLog    /var/www/.logs/thrift.php.server/access_log common
+    
+      <Directory /var/www/thrift-example/server>
+        Options FollowSymLinks Indexes
+        AllowOverride None
+        Order deny,allow
+        Allow from all
+      </Directory>
+    </VirtualHost>
+    
+    # 
+    # CLIENT
+    # 
+    <VirtualHost *:80>
+    	ServerName     thrift.php.client.local
+    	ServerAlias    thrift.php.client thrift.php.client.dev thrift.php.client.dev.local 
+    	DocumentRoot   /var/www/thrift-example/client
+    	DirectoryIndex client.php
+    
+    	ErrorLog     /var/www/.logs/thrift.php.client/error_log
+    	CustomLog    /var/www/.logs/thrift.php.client/access_log common
+    
+    	<Directory /var/www/thrift-example/client>
+              Options FollowSymLinks Indexes
+              AllowOverride None
+              Order deny,allow
+              Allow from all
+    	</Directory>
+    </VirtualHost>
+    
 
 ## Server & Client
 
