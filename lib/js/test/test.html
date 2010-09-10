@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Thrift Javascript Bindings: Unit Test</title>
+
+  <script src="/thrift.js"                  type="text/javascript" charset="utf-8"></script>
+  <script src="gen-js/ThriftTest_types.js" type="text/javascript" charset="utf-8"></script>
+  <script src="gen-js/ThriftTest.js"       type="text/javascript" charset="utf-8"></script>
+
+  <!-- jQuery -->
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" charset="utf-8"></script>
+
+  <!-- QUnit Test framework-->
+  <script type="text/javascript" src="http://github.com/jquery/qunit/raw/master/qunit/qunit.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="http://github.com/jquery/qunit/raw/master/qunit/qunit.css" type="text/css" media="screen" />
+
+  <script type="text/javascript" charset="utf-8">
+  //<![CDATA[
+  $(document).ready(function(){
+    var transport = new Thrift.Transport("/service")
+    var protocol  = new Thrift.Protocol(transport)
+    var client    = new ThriftTest.ThriftTestClient(protocol)
+
+
+    module("Base Types");
+
+    test("String", function() {
+      equals(client.testString("works"), "works");
+    });
+    test("String UTF-8", function() {
+      var languagesUtf8 = "Afrikaans, Alemannisch, Aragonés, العربية, مصرى, Asturianu, Aymar aru, Azərbaycan, Башҡорт, Boarisch, Žemaitėška, Беларуская, Беларуская (тарашкевіца), Български, Bamanankan, বাংলা, Brezhoneg, Bosanski, Català, Mìng-dĕ̤ng-ngṳ̄, Нохчийн, Cebuano, ᏣᎳᎩ, Česky, Словѣ́ньскъ / ⰔⰎⰑⰂⰡⰐⰠⰔⰍⰟ, Чӑвашла, Cymraeg, Dansk, Zazaki, ދިވެހިބަސް, Ελληνικά, Emiliàn e rumagnòl, English, Esperanto, Español, Eesti, Euskara, فارسی, Suomi, Võro, Føroyskt, Français, Arpetan, Furlan, Frysk, Gaeilge, 贛語, Gàidhlig, Galego, Avañe'ẽ, ગુજરાતી, Gaelg, עברית, हिन्दी, Fiji Hindi, Hrvatski, Kreyòl ayisyen, Magyar, Հայերեն, Interlingua, Bahasa Indonesia, Ilokano, Ido, Íslenska, Italiano, 日本語, Lojban, Basa Jawa, ქართული, Kongo, Kalaallisut, ಕನ್ನಡ, 한국어, Къарачай-Малкъар, Ripoarisch, Kurdî, Коми, Kernewek, Кыргызча, Latina, Ladino, Lëtzebuergesch, Limburgs, Lingála, ລາວ, Lietuvių, Latviešu, Basa Banyumasan, Malagasy, Македонски, മലയാളം, मराठी, Bahasa Melayu, مازِرونی, Nnapulitano, Nedersaksisch, नेपाल भाषा, Nederlands, ‪Norsk (nynorsk)‬, ‪Norsk (bokmål)‬, Nouormand, Diné bizaad, Occitan, Иронау, Papiamentu, Deitsch, Norfuk / Pitkern, Polski, پنجابی, پښتو, Português, Runa Simi, Rumantsch, Romani, Română, Русский, Саха тыла, Sardu, Sicilianu, Scots, Sámegiella, Simple English, Slovenčina, Slovenščina, Српски / Srpski, Seeltersk, Svenska, Kiswahili, தமிழ், తెలుగు, Тоҷикӣ, ไทย, Türkmençe, Tagalog, Türkçe, Татарча/Tatarça, Українська, اردو, Tiếng Việt, Volapük, Walon, Winaray, 吴语, isiXhosa, ייִדיש, Yorùbá, Zeêuws, 中文, Bân-lâm-gú, 粵語";
+      equals(client.testString(languagesUtf8), languagesUtf8);
+    });
+    test("Double", function() {
+      equals(client.testDouble(3.14), 3.14);
+    });
+    test("Byte", function() {
+      equals(client.testByte(0x01), 0x01);
+    });
+    test("I32", function() {
+      equals(client.testI32(Math.pow(2,30)), Math.pow(2,30));
+    });
+    test("I64", function() {
+      equals(client.testI64(Math.pow(2,60)), Math.pow(2,60));
+    });
+
+
+    module("Structured Types");
+
+    var insanity  = new ThriftTest.Insanity()
+    insanity.userMap[ThriftTest.Numberz.ONE] = 1
+    insanity.userMap[ThriftTest.Numberz.TWO] = 2
+
+    var xtr = new ThriftTest.Xtruct()
+    xtr.string_thing = 'worked'
+    insanity.xtructs.push(xtr)
+
+    var xtr2= new ThriftTest.Xtruct2()
+    xtr2.struct_thing = xtr
+
+    var list = [1,2,3]
+
+    test("Struct", function() {
+      equals(client.testStruct(xtr).string_thing, "worked");
+    });
+    test("Nest", function() {
+      equals(client.testNest(xtr2).struct_thing.string_thing, "worked");
+    });
+    test("Map", function() {
+      equals(client.testMap(insanity.userMap)[ThriftTest.Numberz.ONE], 1);
+    });
+    test("List", function() {
+      same(client.testList(list), list);
+    });
+    test("Set", function() {
+      same(client.testSet(list), list);
+    });
+    test("Enum", function() {
+      equals(client.testEnum(ThriftTest.Numberz.ONE), ThriftTest.Numberz.ONE);
+    });
+
+
+    module("Exception");
+
+    test("Xception", function() {
+      expect(2);
+      try{
+        client.testException("Xception");
+      }catch(e){
+        equals(e.errorCode, 1);
+        equals(e.message, "Xception");
+      }
+    });
+
+    test("ApplicationException", function() {
+      expect(1);
+      try{
+        client.testException("ApplicationException");
+      }catch(e){
+        equals(e.message, "ApplicationException");
+      }
+    });
+
+    test("no Exception", function() {
+      expect(1);
+      try{
+        client.testException("no Exception");
+      }catch(e){
+        equals(e.message, "no Exception");
+      }
+    });
+
+
+    module("Insanity");
+
+    test("testInsanity", function() {
+      var res = client.testInsanity(insanity);
+      equals(res["1"]["1"].xtructs[0].string_thing, "worked");
+    });
+
+  });
+  //]]>
+  </script>
+
+</head>
+<body>
+
+  <script type="text/javascript" charset="utf-8">
+  //<![CDATA[
+
+  //////////////////////////////////
+  //Run same tests asynchronously
+/*
+  var transport = new Thrift.Transport()
+  var protocol  = new Thrift.Protocol(transport)
+  var client    = new ThriftTest.ThriftTestClient(protocol)
+
+  document.write("<h2>Asynchronous Example<\/h2>")
+  jQuery.ajax({
+     url: "/service",
+     data: client.send_testI32(Math.pow(2,30)),
+     type: "POST",
+     cache: false,
+     success: function(res){
+            var _transport = new Thrift.Transport()
+            var _protocol  = new Thrift.Protocol(_transport)
+            var _client    = new ThriftTest.ThriftTestClient(_protocol)
+
+            _transport.setRecvBuffer( res )
+
+            var v =  _client.recv_testI32()
+            $("#body").append("client.testI32()    => "+(v == Math.pow(2,30))+"<br/>")
+
+     }
+  })
+
+  jQuery.ajax({
+     url: "/service",
+     data: client.send_testI64(Math.pow(2,60)),
+     type: "POST",
+     cache: false,
+     success: function(res){
+            var _transport = new Thrift.Transport()
+            var _protocol  = new Thrift.Protocol(_transport)
+            var _client    = new ThriftTest.ThriftTestClient(_protocol)
+
+            _transport.setRecvBuffer( res )
+
+            var v =  _client.recv_testI64()
+            $("#body").append("client.testI64()    => "+(v == Math.pow(2,60))+"<br/>")
+
+     }
+  })
+*/
+
+  //]]>
+  </script>
+  <h1 id="qunit-header">Thrift Javascript Bindings: Unit Test (<a href="https://svn.apache.org/repos/asf/incubator/thrift/trunk/test/ThriftTest.thrift">ThriftTest.thrift</a>)</h1>
+  <h2 id="qunit-banner"></h2>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"><li><!-- get valid xhtml strict--></li></ol>
+  <p>
+      <a href="http://validator.w3.org/check/referer"><img
+          src="http://www.w3.org/Icons/valid-xhtml10"
+          alt="Valid XHTML 1.0!" height="31" width="88" /></a>
+  </p>
+</body>
+</html>

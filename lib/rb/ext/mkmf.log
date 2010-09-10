@@ -1,0 +1,14 @@
+have_func: checking for strlcpy() in string.h... -------------------- yes
+
+"gcc -o conftest -I. -I/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib/ruby/1.8/universal-darwin10.0 -I/Users/rob/Development/thrift-0.4.0/lib/rb/ext  -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE   -g -O2 -Wall -Werror conftest.c  -L. -L/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/lib -L. -arch i386 -arch x86_64      -lruby  -lpthread -ldl  "
+checked program was:
+/* begin */
+1: #include <string.h>
+2: 
+3: /*top*/
+4: int main() { return 0; }
+5: int t() { void ((*volatile p)()); p = (void ((*)()))strlcpy; return 0; }
+/* end */
+
+--------------------
+
