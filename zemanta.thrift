@@ -1,4 +1,4 @@
-namespace php  analyzer
+namespace php zemanta
 # 
 # EXAMPLE JAVA NAMESPACE
 # Not used in this example
