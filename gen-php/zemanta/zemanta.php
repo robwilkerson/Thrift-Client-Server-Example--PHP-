@@ -6,7 +6,7 @@
  */
 include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 
-include_once 'zemanta_types.php';
+include_once 'zemanta_types.php'; /** MODIFIED. The original include path was wrong */
 
 interface zemantaIf {
   public function analyze($content);
